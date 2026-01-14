@@ -1,19 +1,24 @@
 /* sw.js - Root Directory */
-importScripts('/fantastic-enigma/uv/uv.bundle.js');
-importScripts('/fantastic-enigma/uv/uv.config.js');
-importScripts('/fantastic-enigma/uv/uv.sw.js');
+try {
+    importScripts('/fantastic-enigma/uv/uv.bundle.js');
+    importScripts('/fantastic-enigma/uv/uv.config.js');
+    importScripts('/fantastic-enigma/uv/uv.sw.js');
 
-const sw = new UVServiceWorker();
+    const sw = new UVServiceWorker();
 
-self.addEventListener('fetch', (event) => {
-    event.respondWith(sw.fetch(event));
-});
+    self.addEventListener('install', (event) => {
+        self.skipWaiting(); // Force activation
+    });
 
-// Force the Service Worker to take control immediately
-self.addEventListener('install', (event) => {
-    self.skipWaiting();
-});
+    self.addEventListener('activate', (event) => {
+        event.waitUntil(clients.claim()); // Take control of page immediately
+    });
 
-self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
-});
+    self.addEventListener('fetch', (event) => {
+        event.respondWith(sw.fetch(event));
+    });
+    
+    console.log("SW: Aggressively active on /fantastic-enigma/");
+} catch (e) {
+    console.error("SW: Initialization failed", e);
+}
