@@ -9,7 +9,6 @@ const wispServers = [
 const savedWisp = localStorage.getItem('selectedWisp') || wispServers[0];
 
 self.__uv$config = {
-    // FIXED: Using a relative prefix for GitHub Pages compatibility
     prefix: '/fantastic-enigma/service/',
     bare: '/fantastic-enigma/bare/', 
     wisp: savedWisp, 
@@ -18,7 +17,8 @@ self.__uv$config = {
     handler: '/fantastic-enigma/uv/uv.handler.js',
     bundle: '/fantastic-enigma/uv/uv.bundle.js',
     config: '/fantastic-enigma/uv/uv.config.js',
-    sw: '/fantastic-enigma/uv/uv.sw.js',
+    // FIXED: Points to the sw.js in your main repository folder
+    sw: '/fantastic-enigma/sw.js', 
 };
 
 self.__uv$wispServers = wispServers;
