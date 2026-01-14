@@ -1,9 +1,9 @@
 /* sw.js - Root Directory */
 try {
-    // Explicit full paths for GitHub Pages subfolder
-    importScripts('/fantastic-enigma/uv/uv.bundle.js');
-    importScripts('/fantastic-enigma/uv/uv.config.js');
-    importScripts('/fantastic-enigma/uv/uv.sw.js');
+    // We use relative paths here so the browser looks inside your repo folder
+    importScripts('./uv/uv.bundle.js');
+    importScripts('./uv/uv.config.js');
+    importScripts('./uv/uv.sw.js');
 
     const sw = new UVServiceWorker();
 
@@ -11,7 +11,7 @@ try {
         event.respondWith(sw.fetch(event));
     });
     
-    console.log("Service Worker: Active and Paths Loaded");
+    console.log("SW: Files imported successfully.");
 } catch (e) {
-    console.error("Service Worker: Import Error", e);
+    console.error("SW: Failed to load Ultraviolet scripts. Check your /uv/ folder.", e);
 }
