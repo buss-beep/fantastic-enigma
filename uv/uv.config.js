@@ -17,7 +17,6 @@ self.__uv$config = {
     handler: '/fantastic-enigma/uv/uv.handler.js',
     bundle: '/fantastic-enigma/uv/uv.bundle.js',
     config: '/fantastic-enigma/uv/uv.config.js',
-    // FIXED: Points to the sw.js in your main repository folder
     sw: '/fantastic-enigma/sw.js', 
 };
 
