@@ -1,7 +1,4 @@
-/*
- * sw.js
- * The Service Worker for Ultraviolet.
- */
+/* sw.js - Root Directory */
 importScripts('./uv/uv.bundle.js');
 importScripts('./uv/uv.config.js');
 importScripts('./uv/uv.sw.js');
