@@ -81,13 +81,7 @@ button.addEventListener('click', async () => {
     }
 
     try {
-        // Add a safety timeout to the launch
-        const launchPromise = launch(url);
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error("Launch Timeout - Refresh and try again")), 7000)
-        );
-
-        await Promise.race([launchPromise, timeoutPromise]);
+        await launch(url);
     } catch (err) {
         console.error(err);
         button.innerText = "Error";
@@ -98,21 +92,39 @@ button.addEventListener('click', async () => {
 
 async function launch(url) {
     if (!('serviceWorker' in navigator)) {
-        throw new Error("SW Not Supported");
+        throw new Error("Browser blocks proxy engine.");
     }
 
-    const registration = await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
+    // Register with repo-specific path
+    const registration = await navigator.serviceWorker.register('./sw.js', {
         scope: __uv$config.prefix
     });
 
-    // Explicitly wait for the worker to be ready
-    await navigator.serviceWorker.ready;
-
-    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+    // We wait for the worker to become 'active'
+    return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error("Launch Timeout - Check your /uv/ folder files")), 8000);
+        
+        if (registration.active) {
+            clearTimeout(timeout);
+            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+            resolve();
+        } else {
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'activated') {
+                        clearTimeout(timeout);
+                        window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+                        resolve();
+                    }
+                });
+            });
+        }
+    });
 }
 
 function isUrl(val = '') {
-    if (/^http(s?):\/\//.test(val) || val.includes('.') && val.substr(0, 1) !== ' ') return true;
+    if (/^http(s?):\/\//.test(val) || (val.includes('.') && val.substr(0, 1) !== ' ')) return true;
     return false;
 }
 
