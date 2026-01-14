@@ -1,17 +1,19 @@
 /* sw.js - Root Directory */
-try {
-    // We use relative paths here so the browser looks inside your repo folder
-    importScripts('./uv/uv.bundle.js');
-    importScripts('./uv/uv.config.js');
-    importScripts('./uv/uv.sw.js');
+importScripts('/fantastic-enigma/uv/uv.bundle.js');
+importScripts('/fantastic-enigma/uv/uv.config.js');
+importScripts('/fantastic-enigma/uv/uv.sw.js');
 
-    const sw = new UVServiceWorker();
+const sw = new UVServiceWorker();
 
-    self.addEventListener('fetch', (event) => {
-        event.respondWith(sw.fetch(event));
-    });
-    
-    console.log("SW: Files imported successfully.");
-} catch (e) {
-    console.error("SW: Failed to load Ultraviolet scripts. Check your /uv/ folder.", e);
-}
+self.addEventListener('fetch', (event) => {
+    event.respondWith(sw.fetch(event));
+});
+
+// Force the Service Worker to take control immediately
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
+});
