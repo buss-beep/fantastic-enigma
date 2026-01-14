@@ -66,7 +66,7 @@ button.addEventListener('click', async () => {
     let url = input.value.trim();
     if (!url) return;
 
-    button.innerText = "Launching...";
+    button.innerText = "Connecting...";
     button.disabled = true;
 
     const engines = {
@@ -85,42 +85,25 @@ button.addEventListener('click', async () => {
     } catch (err) {
         console.error(err);
         button.innerText = "Error";
-        alert(err.message);
+        alert("Launch failed: " + err.message);
         setTimeout(() => { button.innerText = "Go"; button.disabled = false; }, 2000);
     }
 });
 
 async function launch(url) {
     if (!('serviceWorker' in navigator)) {
-        throw new Error("Browser blocks proxy engine.");
+        throw new Error("SW Not Supported");
     }
 
-    // Register with repo-specific path
-    const registration = await navigator.serviceWorker.register('./sw.js', {
+    // Register with full repo path
+    await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
         scope: __uv$config.prefix
     });
 
-    // We wait for the worker to become 'active'
-    return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error("Launch Timeout - Check your /uv/ folder files")), 8000);
-        
-        if (registration.active) {
-            clearTimeout(timeout);
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-            resolve();
-        } else {
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'activated') {
-                        clearTimeout(timeout);
-                        window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-                        resolve();
-                    }
-                });
-            });
-        }
-    });
+    // Short delay to let the SW 'claim' the page
+    setTimeout(() => {
+        window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
+    }, 500);
 }
 
 function isUrl(val = '') {
