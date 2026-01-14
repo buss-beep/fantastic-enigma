@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
 });
 
 function setEngine(engine) {
-    currentEngine = engine;
+    searchEngine = engine;
     localStorage.setItem('engine', engine);
     updateUI();
 }
@@ -41,6 +41,7 @@ async function checkStatus() {
 
 async function findWorkingWisp() {
     const servers = self.__uv$wispServers;
+    if (!servers) return;
     for (const url of servers) {
         if (await testWisp(url)) {
             __uv$config.wisp = url;
@@ -65,7 +66,7 @@ button.addEventListener('click', async () => {
     let url = input.value.trim();
     if (!url) return;
 
-    button.innerText = "Connecting...";
+    button.innerText = "Launching...";
     button.disabled = true;
 
     const engines = {
@@ -82,28 +83,25 @@ button.addEventListener('click', async () => {
     try {
         await launch(url);
     } catch (err) {
-        console.error("Launch Error:", err);
+        console.error(err);
         button.innerText = "Error";
-        // This alert is key—tell me what this says!
-        alert("Launch failed: " + err.message); 
+        alert("Launch failed: " + err.message);
         setTimeout(() => { button.innerText = "Go"; button.disabled = false; }, 2000);
     }
 });
 
 async function launch(url) {
     if (!('serviceWorker' in navigator)) {
-        throw new Error("Service Workers are blocked by your browser/school.");
+        throw new Error("SW Not Supported");
     }
 
-    // Register with explicit scope
-    const registration = await navigator.serviceWorker.register('./sw.js', {
+    // FIXED: Use the repository path for registration
+    const registration = await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
         scope: __uv$config.prefix
     });
 
-    // Wait for the worker to be fully ready
     await navigator.serviceWorker.ready;
 
-    // Direct redirect
     window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 }
 
