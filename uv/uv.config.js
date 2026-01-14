@@ -9,15 +9,16 @@ const wispServers = [
 const savedWisp = localStorage.getItem('selectedWisp') || wispServers[0];
 
 self.__uv$config = {
-    prefix: '/service/',
-    bare: '/bare/', 
+    // FIXED: Added relative pathing for GitHub repository subfolders
+    prefix: '/fantastic-enigma/service/',
+    bare: '/fantastic-enigma/bare/', 
     wisp: savedWisp, 
     encodeUrl: Ultraviolet.codec.xor.encode,
     decodeUrl: Ultraviolet.codec.xor.decode,
-    handler: '/uv/uv.handler.js',
-    bundle: '/uv/uv.bundle.js',
-    config: '/uv/uv.config.js',
-    sw: '/uv/uv.sw.js',
+    handler: '/fantastic-enigma/uv/uv.handler.js',
+    bundle: '/fantastic-enigma/uv/uv.bundle.js',
+    config: '/fantastic-enigma/uv/uv.config.js',
+    sw: '/fantastic-enigma/uv/uv.sw.js',
 };
 
 self.__uv$wispServers = wispServers;
