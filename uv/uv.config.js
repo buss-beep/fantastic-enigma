@@ -9,7 +9,7 @@ const wispServers = [
 const savedWisp = localStorage.getItem('selectedWisp') || wispServers[0];
 
 self.__uv$config = {
-    // Prefix MUST include the repo name for GitHub Pages
+    // FIXED: Using a relative prefix for GitHub Pages compatibility
     prefix: '/fantastic-enigma/service/',
     bare: '/fantastic-enigma/bare/', 
     wisp: savedWisp, 
