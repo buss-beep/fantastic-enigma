@@ -82,38 +82,29 @@ button.addEventListener('click', async () => {
     try {
         await launch(url);
     } catch (err) {
-        console.error(err);
+        console.error("Launch Error:", err);
         button.innerText = "Error";
+        // This alert is key—tell me what this says!
+        alert("Launch failed: " + err.message); 
         setTimeout(() => { button.innerText = "Go"; button.disabled = false; }, 2000);
     }
 });
 
 async function launch(url) {
     if (!('serviceWorker' in navigator)) {
-        alert("Your browser is blocking the proxy engine.");
-        return;
+        throw new Error("Service Workers are blocked by your browser/school.");
     }
 
-    // Force clear old workers to prevent 'Does Nothing' glitch
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    for (let reg of registrations) {
-        await reg.unregister();
-    }
-
-    // Register fresh
+    // Register with explicit scope
     const registration = await navigator.serviceWorker.register('./sw.js', {
         scope: __uv$config.prefix
     });
 
-    // Wait for the worker to be ready
-    let worker = registration.active || registration.installing || registration.waiting;
-    
-    const checkReady = setInterval(() => {
-        if (registration.active) {
-            clearInterval(checkReady);
-            window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-        }
-    }, 100);
+    // Wait for the worker to be fully ready
+    await navigator.serviceWorker.ready;
+
+    // Direct redirect
+    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 }
 
 function isUrl(val = '') {
