@@ -9,7 +9,6 @@ const wispServers = [
 const savedWisp = localStorage.getItem('selectedWisp') || wispServers[0];
 
 self.__uv$config = {
-    // FIXED: Added relative pathing for GitHub repository subfolders
     prefix: '/fantastic-enigma/service/',
     bare: '/fantastic-enigma/bare/', 
     wisp: savedWisp, 
