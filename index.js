@@ -41,7 +41,6 @@ async function checkStatus() {
 
 async function findWorkingWisp() {
     const servers = self.__uv$wispServers;
-    if (!servers) return;
     for (const url of servers) {
         if (await testWisp(url)) {
             __uv$config.wisp = url;
@@ -83,45 +82,31 @@ button.addEventListener('click', async () => {
     try {
         await launch(url);
     } catch (err) {
-        console.error(err);
         button.innerText = "Error";
-        alert("Launch failed: " + err.message);
+        alert("Error: " + err.message);
         setTimeout(() => { button.innerText = "Go"; button.disabled = false; }, 2000);
     }
 });
 
 async function launch(url) {
-    if (!('serviceWorker' in navigator)) {
-        throw new Error("SW Not Supported");
-    }
-
-    // Register with full repo path
-    await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
-        scope: __uv$config.prefix
+    const registration = await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
+        scope: '/fantastic-enigma/service/'
     });
 
-    // Short delay to let the SW 'claim' the page
-    setTimeout(() => {
-        window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
-    }, 500);
+    // If the worker isn't active yet, we must wait or the 404 will happen
+    if (!navigator.serviceWorker.controller) {
+        button.innerText = "Initializing...";
+        await new Promise(resolve => {
+            navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
+            // Fallback for Safari/Slow Browsers
+            setTimeout(resolve, 1000);
+        });
+    }
+
+    window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
 }
 
 function isUrl(val = '') {
     if (/^http(s?):\/\//.test(val) || (val.includes('.') && val.substr(0, 1) !== ' ')) return true;
     return false;
-}
-
-function stealthLaunch() {
-    const query = input.value.trim();
-    if (!query) return alert("Enter something first.");
-    const win = window.open();
-    if (!win) return;
-    const iframe = win.document.createElement('iframe');
-    iframe.style.cssText = "width:100%; height:100%; border:none; position:fixed; top:0; left:0;";
-    const engines = { google: 'https://www.google.com/search?q=', ddg: 'https://duckduckgo.com/?q=' };
-    let target = isUrl(query) ? query : engines[currentEngine] + encodeURIComponent(query);
-    if (!target.startsWith('http')) target = 'http://' + target;
-    iframe.src = window.location.origin + __uv$config.prefix + __uv$config.encodeUrl(target);
-    win.document.body.appendChild(iframe);
-    window.location.replace("https://canvas.instructure.com");
 }
