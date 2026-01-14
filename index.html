@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Canvas</title> <link rel="icon" type="image/x-icon" href="https://du11hjcvx0uqb.cloudfront.net/br/dist/images/favicon-e106157072.ico">
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="uv/uv.bundle.js" defer></script>
+    <script src="uv/uv.config.js" defer></script>
+    <script src="index.js" defer></script>
+</head>
+<body>
+    <div class="main-wrapper">
+        <div class="server-status">
+            <span id="status-dot" class="dot-offline"></span>
+            <span id="status-text">Connecting...</span>
+            <button id="switch-wisp" title="Switch Server" onclick="cycleWisp()">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+            </button>
+        </div>
+
+        <h1 class="logo">Search</h1>
+        
+        <div class="search-section">
+            <div class="input-group">
+                <input type="text" id="uv-address" placeholder="Search or type a URL...">
+                <button id="uv-btn">Go</button>
+            </div>
+
+            <div class="engine-toggles">
+                <button class="engine-opt active" id="google-btn" onclick="setEngine('google')">Google</button>
+                <button class="engine-opt" id="ddg-btn" onclick="setEngine('ddg')">DuckDuckGo</button>
+            </div>
+        </div>
+
+        <div class="stealth-footer">
+            <button onclick="stealthLaunch()">Launch About:Blank</button>
+        </div>
+    </div>
+
+    <script>
+        // Panic Key: ESC to Canvas
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.location.replace('https://canvas.instructure.com');
+            }
+        });
+    </script>
+</body>
+</html>
