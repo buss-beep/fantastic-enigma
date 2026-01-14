@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
 });
 
 function setEngine(engine) {
-    searchEngine = engine;
+    currentEngine = engine;
     localStorage.setItem('engine', engine);
     updateUI();
 }
@@ -56,7 +56,7 @@ async function findWorkingWisp() {
 function testWisp(url) {
     return new Promise((resolve) => {
         const socket = new WebSocket(url);
-        const timeout = setTimeout(() => { socket.close(); resolve(false); }, 2000);
+        const timeout = setTimeout(() => { socket.close(); resolve(false); }, 2500);
         socket.onopen = () => { clearTimeout(timeout); socket.close(); resolve(true); };
         socket.onerror = () => { clearTimeout(timeout); resolve(false); };
     });
@@ -81,11 +81,17 @@ button.addEventListener('click', async () => {
     }
 
     try {
-        await launch(url);
+        // Add a safety timeout to the launch
+        const launchPromise = launch(url);
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error("Launch Timeout - Refresh and try again")), 7000)
+        );
+
+        await Promise.race([launchPromise, timeoutPromise]);
     } catch (err) {
         console.error(err);
         button.innerText = "Error";
-        alert("Launch failed: " + err.message);
+        alert(err.message);
         setTimeout(() => { button.innerText = "Go"; button.disabled = false; }, 2000);
     }
 });
@@ -95,11 +101,11 @@ async function launch(url) {
         throw new Error("SW Not Supported");
     }
 
-    // FIXED: Use the repository path for registration
     const registration = await navigator.serviceWorker.register('/fantastic-enigma/sw.js', {
         scope: __uv$config.prefix
     });
 
+    // Explicitly wait for the worker to be ready
     await navigator.serviceWorker.ready;
 
     window.location.href = __uv$config.prefix + __uv$config.encodeUrl(url);
